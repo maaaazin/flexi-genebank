@@ -3,12 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package Dashboards.Admin.Forms;
+import javax.swing.JFrame;
 
 /**
  *
  * @author maazi
  */
 public class Menu extends javax.swing.JPanel {
+    
+    
 
     /**
      * Creates new form Menu
@@ -143,6 +146,19 @@ public class Menu extends javax.swing.JPanel {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
+        System.out.println("Button clicked! Opening Add Sample...");
+
+    // Create a new JFrame to hold the AddSample JPanel
+        JFrame addSampleFrame = new JFrame("Add Sample Frame");
+        addSampleFrame.setSize(600, 400);
+        addSampleFrame.setLocationRelativeTo(null); // Center the window
+        addSampleFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+    // Add AddSample JPanel to this JFrame
+        addSampleFrame.add(new AddSample());
+
+    // Show the frame
+        addSampleFrame.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
