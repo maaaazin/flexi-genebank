@@ -1,11 +1,16 @@
 
 package Dashboards.Admin.Forms;
+import javax.swing.*;
+import java.awt.CardLayout;
 
 
-public class Dashboard extends javax.swing.JPanel {
+public class Dashboard extends JPanel {
+    
 
     public Dashboard() {
         initComponents();
+        
+        
     }
 
 
