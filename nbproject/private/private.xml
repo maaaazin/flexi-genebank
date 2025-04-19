@@ -2,6 +2,22 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/login/Login.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/AdminDashboard.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Researcher/ResearcherDashboard.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Researcher/Forms/Menu.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/Forms/AccessLogs.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/Forms/AddSample.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/Forms/Dashboard.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/Forms/Menu.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/Forms/RequestHistory.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/Forms/ViewInventory.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Admin/Forms/ViewRequests.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Researcher/Forms/RequestSamples.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/login/Main.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Researcher/Forms/ViewRequestStatus.java</file>
+            <file>file:/C:/Users/ASUS/Desktop/flexi-genebank/src/Dashboards/Researcher/Forms/ViewSamples.java</file>
+        </group>
     </open-files>
 </project-private>
