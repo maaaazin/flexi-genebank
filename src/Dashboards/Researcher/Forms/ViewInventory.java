@@ -2,8 +2,8 @@ package Dashboards.Researcher.Forms;
 
 import javax.swing.*;
 
-public class ViewSamples extends JPanel {
-    public ViewSamples() {
+public class ViewInventory extends JPanel {
+    public ViewInventory() {
         initComponents();
     }
 
@@ -15,7 +15,7 @@ public class ViewSamples extends JPanel {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24));
         jLabel1.setForeground(new java.awt.Color(0, 150, 0));
-        jLabel1.setText("View Samples");
+        jLabel1.setText("View Inventory");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

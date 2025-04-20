@@ -1,10 +1,18 @@
 package Dashboards.Researcher.Forms;
 
 import javax.swing.*;
+import java.awt.*;
 
-public class ViewSamples extends JPanel {
-    public ViewSamples() {
+public class Dashboard extends javax.swing.JPanel {
+    private javax.swing.JLabel jLabel1;
+
+    public Dashboard() {
         initComponents();
+        customizeUI();
+    }
+
+    private void customizeUI() {
+        setBackground(new Color(240, 248, 255)); // Alice blue
     }
 
     @SuppressWarnings("unchecked")
@@ -15,7 +23,7 @@ public class ViewSamples extends JPanel {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24));
         jLabel1.setForeground(new java.awt.Color(0, 150, 0));
-        jLabel1.setText("View Samples");
+        jLabel1.setText("Dashboard");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -32,8 +40,4 @@ public class ViewSamples extends JPanel {
                                 .addComponent(jLabel1)
                                 .addContainerGap(550, Short.MAX_VALUE)));
     }
-
-    // Variables declaration
-    private javax.swing.JLabel jLabel1;
-    // End of variables declaration
 }

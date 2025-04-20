@@ -168,11 +168,89 @@ public class DatabaseOperations {
         return pstmt.executeQuery();
     }
 
+    public ResultSet getPendingRequests() throws SQLException {
+        String query = "SELECT requestid, researcherid, researcherName, requestedSampleId, purpose, " +
+                "sampleStatus, RequestDate, requestStatus FROM requestlogs " +
+                "WHERE requestStatus = 'Pending' ORDER BY RequestDate DESC";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+
+    public void updateRequestStatus(int requestId, String status) throws SQLException {
+        // First get the request details
+        String selectQuery = "SELECT * FROM requestlogs WHERE requestid = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement selectStmt = conn.prepareStatement(selectQuery)) {
+            selectStmt.setInt(1, requestId);
+            ResultSet rs = selectStmt.executeQuery();
+
+            if (rs.next()) {
+                // Update the request status
+                String updateQuery = "UPDATE requestlogs SET requestStatus = ? WHERE requestid = ?";
+                try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
+                    updateStmt.setString(1, status);
+                    updateStmt.setInt(2, requestId);
+                    updateStmt.executeUpdate();
+                }
+
+                // Insert into request history
+                String historyQuery = "INSERT INTO requestlogs (requestid, researcherid, researcherName, " +
+                        "requestedSampleId, purpose, sampleStatus, RequestDate, requestStatus) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement historyStmt = conn.prepareStatement(historyQuery)) {
+                    historyStmt.setInt(1, rs.getInt("requestid"));
+                    historyStmt.setInt(2, rs.getInt("researcherid"));
+                    historyStmt.setString(3, rs.getString("researcherName"));
+                    historyStmt.setInt(4, rs.getInt("requestedSampleId"));
+                    historyStmt.setString(5, rs.getString("purpose"));
+                    historyStmt.setString(6, rs.getString("sampleStatus"));
+                    historyStmt.setDate(7, rs.getDate("RequestDate"));
+                    historyStmt.setString(8, status);
+                    historyStmt.executeUpdate();
+                }
+
+                // If approved, update inventory status
+                if (status.equals("Approved")) {
+                    String inventoryQuery = "UPDATE inventory SET Current_Status = 'In Use' WHERE Sample_ID = ?";
+                    try (PreparedStatement inventoryStmt = conn.prepareStatement(inventoryQuery)) {
+                        inventoryStmt.setInt(1, rs.getInt("requestedSampleId"));
+                        inventoryStmt.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+    public void autoRejectDepletedSamples() throws SQLException {
+        String query = "UPDATE requestlogs r " +
+                "JOIN inventory i ON r.requestedSampleId = i.Sample_ID " +
+                "SET r.requestStatus = 'Rejected' " +
+                "WHERE r.requestStatus = 'Pending' AND i.Current_Status = 'Depleted'";
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.executeUpdate();
+        }
+    }
+
     public ResultSet getRequestLogs() throws SQLException {
         String query = "SELECT requestid, researcherid, researcherName, requestedSampleId, purpose, " +
                 "sampleStatus, RequestDate, requestStatus FROM requestlogs ORDER BY RequestDate DESC";
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+
+    public static ResultSet getResearcherRequests(int researcherId) throws SQLException {
+        String query = "SELECT r.requestid, s.samplename, r.purpose, r.requestdate, r.status " +
+                "FROM requestlogs r " +
+                "JOIN samples s ON r.sampleid = s.sampleid " +
+                "WHERE r.researcherid = ? " +
+                "ORDER BY r.requestdate DESC";
+
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, researcherId);
         return pstmt.executeQuery();
     }
 }
