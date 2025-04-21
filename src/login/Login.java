@@ -239,7 +239,7 @@ public class Login extends javax.swing.JFrame {
             this.dispose();
             if (userType.equals("researcher")) {
                 // Open Researcher Dashboard
-                new ResearcherDashboard().setVisible(true);
+                new ResearcherDashboard(Integer.parseInt(userId)).setVisible(true);
             } else if (userType.equals("admin")) {
                 // Open Admin Dashboard
                 new AdminDashboard().setVisible(true);

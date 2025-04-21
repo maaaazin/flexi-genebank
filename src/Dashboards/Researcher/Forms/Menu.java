@@ -43,7 +43,7 @@ public class Menu extends javax.swing.JPanel {
         jButton2.setText("Request Samples");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                researcherDashboard.switchForm(new RequestSample());
+                researcherDashboard.switchForm(new RequestSample(researcherDashboard));
             }
         });
 
@@ -52,7 +52,7 @@ public class Menu extends javax.swing.JPanel {
         jButton3.setText("View Request Status");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                researcherDashboard.switchForm(new ViewRequestStatus());
+                researcherDashboard.switchForm(new ViewRequestStatus(researcherDashboard));
             }
         });
 
@@ -61,7 +61,7 @@ public class Menu extends javax.swing.JPanel {
         jButton4.setText("View Samples");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                researcherDashboard.switchForm(new ViewSamples());
+                researcherDashboard.switchForm(new ViewSamples(researcherDashboard.getResearcherId()));
             }
         });
 

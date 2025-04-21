@@ -13,6 +13,9 @@ public class Dashboard extends javax.swing.JPanel {
 
     private void customizeUI() {
         setBackground(new Color(240, 248, 255)); // Alice blue
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24));
+        jLabel1.setForeground(new java.awt.Color(0, 150, 0));
+        jLabel1.setText("Dashboard");
     }
 
     @SuppressWarnings("unchecked")

@@ -194,27 +194,11 @@ public class DatabaseOperations {
                     updateStmt.executeUpdate();
                 }
 
-                // Insert into request history
-                String historyQuery = "INSERT INTO requestlogs (requestid, researcherid, researcherName, " +
-                        "requestedSampleId, purpose, sampleStatus, RequestDate, requestStatus) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement historyStmt = conn.prepareStatement(historyQuery)) {
-                    historyStmt.setInt(1, rs.getInt("requestid"));
-                    historyStmt.setInt(2, rs.getInt("researcherid"));
-                    historyStmt.setString(3, rs.getString("researcherName"));
-                    historyStmt.setInt(4, rs.getInt("requestedSampleId"));
-                    historyStmt.setString(5, rs.getString("purpose"));
-                    historyStmt.setString(6, rs.getString("sampleStatus"));
-                    historyStmt.setDate(7, rs.getDate("RequestDate"));
-                    historyStmt.setString(8, status);
-                    historyStmt.executeUpdate();
-                }
-
                 // If approved, update inventory status
                 if (status.equals("Approved")) {
                     String inventoryQuery = "UPDATE inventory SET Current_Status = 'In Use' WHERE Sample_ID = ?";
                     try (PreparedStatement inventoryStmt = conn.prepareStatement(inventoryQuery)) {
-                        inventoryStmt.setInt(1, rs.getInt("requestedSampleId"));
+                        inventoryStmt.setString(1, rs.getString("requestedSampleId"));
                         inventoryStmt.executeUpdate();
                     }
                 }
@@ -242,15 +226,148 @@ public class DatabaseOperations {
     }
 
     public static ResultSet getResearcherRequests(int researcherId) throws SQLException {
-        String query = "SELECT r.requestid, s.samplename, r.purpose, r.requestdate, r.status " +
-                "FROM requestlogs r " +
-                "JOIN samples s ON r.sampleid = s.sampleid " +
-                "WHERE r.researcherid = ? " +
-                "ORDER BY r.requestdate DESC";
+        String query = "SELECT requestid, requestedSampleId, purpose, RequestDate, requestStatus " +
+                "FROM requestlogs " +
+                "WHERE researcherid = ? " +
+                "ORDER BY RequestDate DESC";
 
         Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query);
         pstmt.setInt(1, researcherId);
+        return pstmt.executeQuery();
+    }
+
+    public static boolean isSampleAvailable(String sampleId) throws SQLException {
+        String query = "SELECT Current_Status FROM inventory WHERE Sample_ID = ?";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, sampleId);
+        ResultSet rs = pstmt.executeQuery();
+        return rs.next() && rs.getString("Current_Status").equals("Available");
+    }
+
+    public static String getResearcherName(int researcherId) throws SQLException {
+        String query = "SELECT Name FROM researcher WHERE Researcher_ID = ?";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, researcherId);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (!rs.next()) {
+            System.out.println("No researcher found with ID: " + researcherId);
+            return null;
+        }
+
+        String name = rs.getString("Name");
+        System.out.println("Found researcher: " + name);
+        return name;
+    }
+
+    public static int getNextRequestId() throws SQLException {
+        String query = "SELECT MAX(requestid) as max_id FROM requestlogs";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        ResultSet rs = pstmt.executeQuery();
+        return rs.next() ? rs.getInt("max_id") + 1 : 1;
+    }
+
+    public static void insertRequestLog(int requestId, int researcherId, String researcherName,
+            String sampleId, String purpose) throws SQLException {
+        String query = "INSERT INTO requestlogs (requestid, researcherid, researcherName, " +
+                "requestedSampleId, purpose, sampleStatus, RequestDate, requestStatus) " +
+                "VALUES (?, ?, ?, ?, ?, (SELECT Current_Status FROM inventory WHERE Sample_ID = ?), " +
+                "CURRENT_DATE, 'Pending')";
+
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, requestId);
+        pstmt.setInt(2, researcherId);
+        pstmt.setString(3, researcherName);
+        pstmt.setString(4, sampleId);
+        pstmt.setString(5, purpose);
+        pstmt.setString(6, sampleId);
+        pstmt.executeUpdate();
+    }
+
+    public static ResultSet getSamplesWithGeneticMarkers() throws SQLException {
+        String query = "SELECT gs.Sample_ID, gs.Sample_Type, gm.Chromosome_Location, gm.Mutation_Type, gm.Impact " +
+                "FROM gene_sample gs " +
+                "LEFT JOIN genetic_markers gm ON gs.Sample_ID = gm.Sample_ID " +
+                "ORDER BY gs.Sample_ID";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+
+    public static ResultSet getSampleDetails(String sampleId) throws SQLException {
+        String query = "SELECT " +
+                "gs.*, d.*, fh.*, l.*, ed.*, gep.*, gm.*, c.* " +
+                "FROM gene_sample gs " +
+                "LEFT JOIN donor d ON gs.Donor_ID = d.Donor_ID " +
+                "LEFT JOIN family_history fh ON d.Donor_ID = fh.Donor_ID " +
+                "LEFT JOIN lifestyle l ON d.Donor_ID = l.Donor_ID " +
+                "LEFT JOIN epigenetic_data ed ON gs.Sample_ID = ed.Sample_ID " +
+                "LEFT JOIN gene_expression_profiles gep ON gs.Sample_ID = gep.Sample_ID " +
+                "LEFT JOIN genetic_markers gm ON gs.Sample_ID = gm.Sample_ID " +
+                "LEFT JOIN consent c ON d.Donor_ID = c.Donor_ID " +
+                "WHERE gs.Sample_ID = ?";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setString(1, sampleId);
+        return pstmt.executeQuery();
+    }
+
+    public static void insertAccessLog(int researcherId, String name, String sampleId) throws SQLException {
+        String query = "INSERT INTO access_logs (researcherid, name, sampleid, date, time) " +
+                "VALUES (?, ?, ?, CURRENT_DATE, CURRENT_TIME)";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, researcherId);
+        pstmt.setString(2, name);
+        pstmt.setString(3, sampleId);
+        pstmt.executeUpdate();
+    }
+
+    public ResultSet getAccessLogs() throws SQLException {
+        String query = "SELECT researcherid, name, sampleid, date, time FROM access_logs ORDER BY date DESC, time DESC";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+
+    public ResultSet getSamplesInUse() throws SQLException {
+        String query = "SELECT COUNT(*) as count FROM inventory WHERE Current_Status = 'In Use'";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+
+    public ResultSet getPendingRequestsCount() throws SQLException {
+        String query = "SELECT COUNT(*) as count FROM requestlogs WHERE requestStatus = 'Pending'";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+
+    public ResultSet getReportsViewedToday() throws SQLException {
+        String query = "SELECT COUNT(*) as count FROM access_logs WHERE date = CURRENT_DATE";
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        return pstmt.executeQuery();
+    }
+
+    public ResultSet getResearcherMetrics(int researcherId) throws SQLException {
+        String query = "SELECT " +
+                "(SELECT COUNT(*) FROM requestlogs WHERE researcherid = ?) as total_requests, " +
+                "(SELECT COUNT(*) FROM requestlogs WHERE researcherid = ? AND requeststatus = 'Approved') as approved_requests, "
+                +
+                "(SELECT COUNT(*) FROM requestlogs WHERE researcherid = ? AND requeststatus = 'Pending') as pending_requests";
+
+        Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query);
+        pstmt.setInt(1, researcherId);
+        pstmt.setInt(2, researcherId);
+        pstmt.setInt(3, researcherId);
         return pstmt.executeQuery();
     }
 }

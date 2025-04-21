@@ -21,6 +21,7 @@ public class Dashboard extends JPanel {
         try {
             db = new DatabaseOperations();
             loadRecentRequests();
+            loadDashboardMetrics();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error connecting to database: " + e.getMessage());
         }
@@ -45,6 +46,26 @@ public class Dashboard extends JPanel {
         // Customize scroll pane
         jScrollPane1.setBackground(new Color(240, 248, 255));
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Customize title label
+        jLabel1.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        jLabel1.setForeground(new Color(0, 150, 136));
+
+        // Customize metric boxes
+        jPanel4.setBackground(new Color(0, 150, 136)); // Teal
+        jPanel3.setBackground(new Color(255, 102, 102)); // Red
+        jPanel2.setBackground(new Color(76, 175, 80)); // Green
+
+        // Set white text for all labels
+        jLabel2.setForeground(Color.WHITE);
+        jLabel3.setForeground(Color.WHITE);
+        jLabel4.setForeground(Color.WHITE);
+        jLabel5.setForeground(Color.WHITE);
+        jLabel6.setForeground(Color.WHITE);
+        jLabel7.setForeground(Color.WHITE);
+        jLabel8.setForeground(Color.WHITE);
+        jLabel9.setForeground(Color.WHITE);
+        jLabel10.setForeground(Color.WHITE);
     }
 
     private void loadRecentRequests() {
@@ -69,6 +90,42 @@ public class Dashboard extends JPanel {
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error loading request logs: " + e.getMessage());
+        }
+    }
+
+    private void loadDashboardMetrics() {
+        try {
+            // Samples in Use
+            ResultSet rs = db.getSamplesInUse();
+            if (rs.next()) {
+                jLabel2.setText(String.valueOf(rs.getInt("count")));
+            }
+            rs.close();
+
+            // Pending Requests
+            rs = db.getPendingRequestsCount();
+            if (rs.next()) {
+                jLabel6.setText(String.valueOf(rs.getInt("count")));
+            }
+            rs.close();
+
+            // Reports Viewed Today
+            rs = db.getReportsViewedToday();
+            if (rs.next()) {
+                jLabel9.setText(String.valueOf(rs.getInt("count")));
+            }
+            rs.close();
+
+            // Set titles and descriptions
+            jLabel3.setText("Samples");
+            jLabel4.setText("Currently in Use");
+            jLabel5.setText("Requests");
+            jLabel7.setText("Pending Approval");
+            jLabel10.setText("Reports");
+            jLabel8.setText("Viewed Today");
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error loading dashboard metrics: " + e.getMessage());
         }
     }
 
@@ -163,11 +220,11 @@ public class Dashboard extends JPanel {
                                 .addGap(32, 32, 32)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel2)
-                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 39,
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 200,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 136,
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 200,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(137, Short.MAX_VALUE)));
+                                .addContainerGap(32, Short.MAX_VALUE)));
         jPanel4Layout.setVerticalGroup(
                 jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
@@ -202,11 +259,11 @@ public class Dashboard extends JPanel {
                                 .addGap(32, 32, 32)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel9)
-                                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 39,
+                                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 200,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 136,
+                                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 200,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(130, Short.MAX_VALUE)));
+                                .addContainerGap(32, Short.MAX_VALUE)));
         jPanel3Layout.setVerticalGroup(
                 jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
@@ -241,11 +298,11 @@ public class Dashboard extends JPanel {
                                 .addGap(32, 32, 32)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel6)
-                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39,
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 200,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 136,
+                                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 200,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(127, Short.MAX_VALUE)));
+                                .addContainerGap(32, Short.MAX_VALUE)));
         jPanel2Layout.setVerticalGroup(
                 jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()

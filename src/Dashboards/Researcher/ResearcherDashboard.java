@@ -6,8 +6,10 @@ import Dashboards.Researcher.Forms.*;
 
 public class ResearcherDashboard extends javax.swing.JFrame {
     private JPanel currentForm;
+    private int researcherId;
 
-    public ResearcherDashboard() {
+    public ResearcherDashboard(int researcherId) {
+        this.researcherId = researcherId;
         initComponents();
         // Set initial form to dashboard
         switchForm(new Dashboard());
@@ -21,6 +23,10 @@ public class ResearcherDashboard extends javax.swing.JFrame {
         contentPanel.add(newForm);
         contentPanel.revalidate();
         contentPanel.repaint();
+    }
+
+    public int getResearcherId() {
+        return researcherId;
     }
 
     @SuppressWarnings("unchecked")
